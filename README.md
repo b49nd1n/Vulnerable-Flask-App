@@ -120,6 +120,9 @@ un script Python qui définit une application Flask. Cette application semble av
 
 ##  Corrections de Sécurité dans le Code
 
+**Voir le code dans**: best-flask-appSafe.py
+
+
 Le tableau suivant résume les corrections apportées au code pour atténuer les vulnérabilités de sécurité, les attaques associées, et les commentaires et recommandations correspondants.
 
 | Attaque / Vulnérabilité   | URL/Endpoint       | Code Avant Correction                                       | Code Après Correction                                       | Commentaires et Recommandations                               |
