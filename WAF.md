@@ -34,6 +34,61 @@ Si nécessaire, vous pouvez personnaliser la liste attack_patterns dans le scrip
 
 N'oubliez pas que ce script est un exemple basique et ne couvre pas tous les aspects de la sécurité d'une application. Dans un environnement de production, vous voudrez peut-être explorer des solutions de sécurité plus robustes et bien établies, en utilisant des outils tels que des pare-feu applicatifs Web (WAF) tiers, des services de sécurité gérés, etc
 
+## Intégrer un WAF (Web Application Firewall) à l'architecture d'une application web
+
+Intégrer un WAF (Web Application Firewall) à l'architecture d'une application web en Python peut se faire de plusieurs manières en fonction de l'infrastructure et des besoins spécifiques de l'application. Voici quelques approches générales :
+
+**Middleware dans le Framework Web :**
+
+Si votre application web utilise un framework tel que Flask ou Django, vous pouvez intégrer le WAF en tant que middleware dans le framework.
+Dans le cas de Flask, comme nous l'avons vu précédemment, vous pouvez utiliser @app.before_request pour exécuter du code avant chaque requête. Ceci peut servir à effectuer des vérifications de sécurité, y compris celles d'un WAF.
+
+**Reverse Proxy :**
+
+Placez le WAF en tant que reverse proxy devant votre serveur web principal. Les reverse proxies tels que Nginx ou Apache peuvent être configurés pour agir comme des pare-feu applicatifs Web.
+Le WAF interceptera les requêtes avant qu'elles n'atteignent votre application et les inspectera pour détecter d'éventuelles attaques.
+
+**Service Cloud WAF :**
+
+Utilisez un service de sécurité cloud qui propose des fonctionnalités de WAF. Certains fournisseurs de services cloud offrent des solutions WAF en tant que service géré.
+Configurez votre application pour acheminer le trafic web via ce service cloud.
+Middleware personnalisé dans le Framework Web :
+
+Si votre application utilise un framework web personnalisé, vous pouvez créer un middleware personnalisé pour gérer la sécurité, y compris les aspects du WAF.
+Assurez-vous que le middleware est correctement configuré pour être exécuté avant le traitement de la requête.
+Voici un exemple de middleware générique pour Flask qui pourrait être utilisé comme point de départ pour une intégration de WAF :
+
+```python
+
+from flask import Flask, request, jsonify
+import re
+
+app = Flask(__name__)
+
+# Liste des attaques à bloquer avec des expressions régulières
+attack_patterns = {
+    # ... (comme défini précédemment)
+}
+
+# Middleware Flask pour le WAF
+@app.before_request
+def waf_protection():
+    for attack, patterns in attack_patterns.items():
+        if any(re.search(pattern, request.url, re.IGNORECASE) for pattern in patterns):
+            return jsonify(error=f"Blocked by WAF: {attack}"), 403
+
+# Route d'exemple
+@app.route('/')
+def index():
+    return 'Hello, World!'
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+```
+
+Notez que cette approche générique nécessite une adaptation en fonction de la complexité de votre application et des attaques spécifiques que vous souhaitez détecter. Les solutions de sécurité doivent être intégrées de manière à ne pas compromettre la fonctionnalité de l'application tout en fournissant une protection adéquate contre les menaces.
+
 ## Exemples d'URLs pour Tester le WAF
 
 | URL d'Exemple                                  | Attaque Détectée        | Réponse Attendue                                      | Explications et Commentaires                                     |
