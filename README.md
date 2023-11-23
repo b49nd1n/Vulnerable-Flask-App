@@ -88,7 +88,6 @@ un script Python qui définit une application Flask. Cette application semble av
 
 /upload : Gère les téléchargements de fichiers.
 
-
 +-----------------------------------------+-----------------------+---------------------------------------------------------------------------+------------------------------------------+
 |           Vulnérabilité                   |     Type d'Attaque    |                       Exemple de Requête Malveillante                     |                Commentaire                 |
 +-----------------------------------------+-----------------------+---------------------------------------------------------------------------+------------------------------------------+
@@ -113,4 +112,3 @@ un script Python qui définit une application Flask. Cette application semble av
 | Spoofing d'Adresse IP dans `/factorial/<int:n>` | Spoofing d'Adresse IP | `curl --header "X-Forwarded-For: attacker_ip" http://adresse_ip:8081/factorial/5` | Exploite une vulnérabilité pour simuler une adresse IP falsifiée. |
 | Contournement d'Authentification dans `/get_admin_mail/<string:control>` | Contournement d'Authentification | `curl http://adresse_ip:8081/get_admin_mail/protected` | Exploite une faiblesse dans le contrôle d'authentification pour accéder à des données protégées. |
 +-----------------------------------------+-----------------------+---------------------------------------------------------------------------+------------------------------------------+
-
