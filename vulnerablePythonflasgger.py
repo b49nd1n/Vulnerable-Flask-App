@@ -5,6 +5,12 @@ from werkzeug.datastructures import Headers
 from werkzeug.utils import secure_filename
 import sqlite3
 
+   """
+  * pip install flasgger
+
+* Vous pouvez accéder à la documentation Swagger en visitant /apidocs ou /apidocs/index.html sur votre serveur Flask. Assurez-vous de personnaliser les commentaires en fonction de votre logique d'endpoint pour une documentation plus précise.
+   """
+
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = "/home/kali/Desktop/upload"
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
