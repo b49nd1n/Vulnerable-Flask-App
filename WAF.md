@@ -113,3 +113,70 @@ Notez que cette approche générique nécessite une adaptation en fonction de la
 | `http://127.0.0.1:5000/?param=%7B%7B2%2B2%7D%7D` | Server Side Template Injection (Encoded) | `{"error": "Blocked by WAF: ServerSideTemplateInjection"}` | Tentative d'injection de template côté serveur encodée avec URL |
 | `http://127.0.0.1:5000/?param=pickle.dumps`   | Autres Méthodes Pickle  | `{"error": "Blocked by WAF: InsecureDeserialization"}` | Tentative d'utilisation d'autres méthodes de Pickle pour contourner la désérialisation sécurisée |
 
+## Intégrer Nginx en tant que WAF (Web Application Firewall) 
+
+Intégrer Nginx en tant que WAF (Web Application Firewall) peut être réalisé en utilisant le module Nginx ModSecurity. ModSecurity est un pare-feu d'application web open source qui peut être utilisé pour détecter et prévenir diverses attaques web. Voici les étapes pour configurer Nginx avec ModSecurity en tant que WAF :
+
+Étapes Générales :
+
+**Installer Nginx avec ModSecurity :**
+
+Assurez-vous que Nginx est installé sur votre serveur.
+
+Installez ModSecurity. La manière précise dépend de votre système d'exploitation. Pour Ubuntu, vous pouvez utiliser la commande suivante :
+
+```bash
+sudo apt-get install libnginx-modsecurity
+```
+
+**Configurer ModSecurity :**
+
+La configuration de ModSecurity se trouve généralement dans /etc/nginx/modsecurity.
+
+Créez ou modifiez le fichier de configuration principal de ModSecurity, par exemple, /etc/nginx/modsecurity/modsecurity.conf. Assurez-vous que SecRuleEngine est réglé sur On pour activer ModSecurity.
+
+```nginx
+SecRuleEngine On
+```
+Configurez d'autres règles de sécurité selon vos besoins dans le même fichier ou dans des fichiers inclus.
+
+Configurer Nginx pour Utiliser ModSecurity :
+
+Dans la configuration Nginx principale (généralement /etc/nginx/nginx.conf), ajoutez la ligne suivante dans le bloc http pour charger le module ModSecurity :
+
+```nginx
+load_module modules/ngx_http_modsecurity_module.so;
+```
+Ajoutez la configuration ModSecurity dans le bloc server de votre site :
+
+```nginx
+
+server {
+    # ... Autres configurations ...
+
+    location / {
+        ModSecurityEnabled on;
+        ModSecurityConfig modsecurity.conf;
+        # ... Autres configurations ...
+    }
+}
+```
+
+Redémarrez Nginx :
+
+Après avoir apporté des modifications à la configuration, redémarrez Nginx pour appliquer les changements.
+
+```bash
+sudo service nginx restart
+```
+
+Notes Importantes :
+Assurez-vous de tester soigneusement votre application après avoir activé ModSecurity. Certaines règles peuvent interférer avec le fonctionnement normal de votre application.
+Surveillez les logs de ModSecurity (généralement situés dans /var/log/nginx/error.log ou /var/log/modsec_audit.log) pour détecter des événements de sécurité.
+Personnalisation des Règles ModSecurity :
+Vous pouvez personnaliser les règles ModSecurity pour répondre aux besoins spécifiques de votre application. Les règles sont généralement configurées dans des fichiers .conf dans le répertoire de configuration de ModSecurity.
+
+Documentation Supplémentaire :
+Documentation ModSecurity pour Nginx
+ModSecurity Reference Manual
+Ces étapes devraient vous aider à configurer Nginx avec ModSecurity en tant que WAF pour votre application web.
