@@ -118,3 +118,30 @@ un script Python qui définit une application Flask. Cette application semble av
 | DOS dans `/factorial/<int:n>` | Attaque par Déni de Service | `curl http://adresse_ip:8081/factorial/1000000` | Exploite la limitation de requête pour effectuer une attaque par déni de service. |
 | Upload de Fichier dans `/upload` | Téléchargement de Fichier Malveillant | `curl -X POST -F "file=@malicious_file.php" http://adresse_ip:8081/upload` | Exploite une mauvaise validation de fichiers pour télécharger un fichier malveillant. |
 
+##  Corrections de Sécurité dans le Code
+
+Le tableau suivant résume les corrections apportées au code pour atténuer les vulnérabilités de sécurité, les attaques associées, et les commentaires et recommandations correspondants.
+
+| Attaque / Vulnérabilité   | URL/Endpoint       | Code Avant Correction                                       | Code Après Correction                                       | Commentaires et Recommandations                               |
+|----------------------------|---------------------|-------------------------------------------------------------|-------------------------------------------------------------|----------------------------------------------------------------|
+| Injection SQL              | `/user/<string:name>` | `cur.execute("select * from test where username = '%s'" % name)` | `cur.execute("select * from test where username = ?", (name,))` | Utilise des requêtes paramétrées pour prévenir l'injection SQL. |
+| SSTI                       | `/hello`             | `render_template_string(template)`                           | `render_template_string(escape(template))`                 | Échappe les données avant de les rendre pour éviter SSTI.      |
+| XSS                        | `/hello`             | `return render_template_string(template)`                    | `return render_template_string(escape(template))`           | Échappe les données pour prévenir l'injection de script.       |
+| Command Injection          | `/get_users`         | `subprocess.check_output(command, shell=True)`               | `subprocess.check_output(command)`                          | Utilise une liste d'arguments pour prévenir l'injection de commande. |
+| Traversée de Répertoire    | `/read_file`         | `file = open(filename, "r")`                                  | `filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)`<br>`file = open(filepath, "r")` | Vérifie le chemin du fichier pour prévenir la traversée de répertoire. |
+| Brute Force                | `/login`             | `if "anil" in username and "cyber" in passwd:`               | Utilise un mécanisme de verrouillage pour éviter les attaques par force brute. |
+| Téléchargement Malveillant | `/upload`            | `file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))` | Vérifie le type de fichier pour éviter les téléchargements malveillants. |
+| HTML Injection             | `/welcome2`          | `data = "Welcome " + name`                                    | `data = "Welcome " + escape(name)`                         | Échappe les données pour prévenir l'injection HTML.            |
+| Deserialization Malveillante | `/deserialization/`  | `data = pickle.loads(received_data)`                          | Utilise la désérialisation sécurisée avec pickle.           |
+| Spoofing d'Adresse IP      | `/factorial/<int:n>` | `curl --header "X-Forwarded-For: attacker_ip" http://adresse_ip:8081/factorial/5` | Utilise des moyens appropriés pour détecter l'adresse IP réelle. |
+| Contournement d'Authentification | `/get_admin_mail/<string:control>` | `if control=="admin":` | Utilise un mécanisme d'authentification sécurisé plutôt qu'une simple comparaison. |
+| Limite de Requête           | `/factorial/<int:n>` | `if connection[request.remote_addr] > 2:`                    | Utilise un mécanisme de verrouillage pour éviter les attaques par déni de service. |
+| Énumération d'Utilisateurs  | `/get_users`         | `curl http://adresse_ip:8081/get_users?hostname=google.com; ls /home` | Vérifie si l'utilisateur a le droit de récupérer ces informations. |
+| Énumération de Fichiers     | `/get_log/`          | `curl http://adresse_ip:8081/get_log/../../../etc/`          | Vérifie si l'utilisateur a le droit de récupérer ces informations. |
+| Modification de Logs        | `/logs`              | `curl http://adresse_ip:8081/logs?data=malicious_log_entry`  | Valide et filtre les données avant de les insérer dans les logs. |
+| Interception de Session     | `/login`             | `curl -X GET "http://adresse_ip:8081/login?username=admin&password=malicious&cookie=attacker_cookie"` | Assurez-vous que les cookies de session sont sécurisés et ne peuvent pas être interceptés. |
+| Information Disclosure      | `/get_users`         | `curl http://adresse_ip:8081/get_users?hostname=nonexistent_user` | Gérez les erreurs de manière appropriée plutôt que de divulguer des informations sensibles. |
+| DOS (Attaque par Déni de Service) | `/factorial/<int:n>` | `curl http://adresse_ip:8081/factorial/1000000` | Limitez les opérations intensives en ressources pour éviter le déni de service. |
+| Injection de Formulaire     | `/login`             | `curl -X GET "http://adresse_ip:8081/login?username=malicious&password=' OR '1'='1"` | Validez et échappez les données du formulaire avant de les utiliser. |
+| Énumération de Fichiers     | `/get_log/`          | `curl http://adresse_ip:8081/get_log/../../../etc/`          | Gérez les accès aux fichiers de manière stricte et contrôlée. |
+| Énumération d'Utilisateurs  | `/get_users`         | `curl http://adresse_ip:8081/get_users?hostname=google.com; ls /home` | Gérez les accès aux informations d'utilisateur de manière stricte. |
