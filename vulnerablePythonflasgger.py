@@ -1,9 +1,11 @@
-from flask import Flask, jsonify, request, Response, render_template_string
+from flask import Flask, render_template,jsonify, request, Response, render_template_string
 from flasgger import Swagger
+from flask_bootstrap import Bootstrap
 import subprocess
 from werkzeug.datastructures import Headers
 from werkzeug.utils import secure_filename
 import sqlite3
+
 
    """
   * pip install flasgger
@@ -15,18 +17,44 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = "/home/kali/Desktop/upload"
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000
 swagger = Swagger(app)  # Initialise Swagger
+bootstrap = Bootstrap(app)  # Initialise Flask-Bootstrap
 
-# Endpoint pour obtenir la page principale
+# Nouvel endpoint pour la page d'accueil avec des composants Bootstrap
 @app.route("/")
-def main_page():
+def home():
     """
-    Endpoint to get the main page.
+    Home page with Bootstrap components for security tests.
+    """
+    return render_template('home.html')
+
+# Nouvel endpoint pour le formulaire sur la page d'accueil
+@app.route("/submit_form", methods=["POST"])
+def submit_form():
+    """
+    Endpoint to handle form submission on the home page.
     ---
+    parameters:
+      - name: username
+        in: formData
+        type: string
+        description: The username from the form.
+        required: true
+      - name: password
+        in: formData
+        type: string
+        description: The password from the form.
+        required: true
     responses:
       200:
-        description: Main page of the REST API
+        description: Result of the form submission.
     """
-    return "REST API"
+    username = request.form.get('username')
+    password = request.form.get('password')
+
+    # Perform security tests or other logic here
+
+    result = f"Form submitted with username: {username}, password: {password}"
+    return jsonify(data=result), 200
 
 # Endpoint pour rechercher un utilisateur par nom
 @app.route("/user/<string:name>")
