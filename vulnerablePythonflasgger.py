@@ -47,14 +47,37 @@ def submit_form():
     responses:
       200:
         description: Result of the form submission.
+      400:
+        description: Bad request, invalid input.
     """
     username = request.form.get('username')
     password = request.form.get('password')
 
-    # Perform security tests or other logic here
+    try:
+        # Perform security tests or other logic here
 
-    result = f"Form submitted with username: {username}, password: {password}"
-    return jsonify(data=result), 200
+        # Validation du format du nom d'utilisateur et du mot de passe
+        if not re.match("^[a-zA-Z0-9_-]+$", username):
+            return jsonify(error="Invalid username format"), 400
+
+        if not (len(password) >= 8 and any(c.isupper() for c in password) and any(c.islower() for c in password) and any(c.isdigit() for c in password)):
+            return jsonify(error="Invalid password format"), 400
+
+        # Protection contre les attaques par injection SQL
+        con = sqlite3.connect("test.db")
+        cur = con.cursor()
+        cur.execute("SELECT * FROM test WHERE username = ?", (username,))
+        data = str(cur.fetchall())
+        con.close()
+
+        # Protection contre les attaques XSS
+        result = f"Form submitted with username: {Markup.escape(username)}, password: {Markup.escape(password)}, data: {Markup.escape(data)}"
+        return jsonify(data=result), 200
+
+    except Exception as e:
+        # Log the exception and return a 500 Internal Server Error response
+        app.logger.error(f"An error occurred: {e}")
+        return jsonify(error="Internal Server Error"), 500
 
 # Endpoint pour rechercher un utilisateur par nom
 @app.route("/user/<string:name>")
