@@ -180,3 +180,28 @@ Documentation Supplémentaire :
 Documentation ModSecurity pour Nginx
 ModSecurity Reference Manual
 Ces étapes devraient vous aider à configurer Nginx avec ModSecurity en tant que WAF pour votre application web.
+
+## Comportements de Nginx avec ModSecurity - Exemples
+
+| Exemple | URL d'Exemple | Comportement Attendu | Explications et Commentaires |
+|---------|---------------|-----------------------|------------------------------|
+| 1       | `http://example.com/?param=select` | Requête bloquée | ModSecurity détecte une injection SQL dans le paramètre et bloque la requête. |
+| 2       | `http://example.com/?param=<script>` | Requête bloquée | ModSecurity détecte une tentative d'injection de script XSS et bloque la requête. |
+| 3       | `http://example.com/?param=;ls` | Requête bloquée | ModSecurity détecte une tentative d'injection de commande et bloque la requête. |
+| 4       | `http://example.com/?param=../../etc/passwd` | Requête bloquée | ModSecurity détecte une tentative de traversée de chemin et bloque la requête. |
+| 5       | `http://example.com/?param=file:///etc/passwd` | Requête bloquée | ModSecurity détecte une tentative d'exécution de code à distance et bloque la requête. |
+| 6       | `http://example.com/?param=%0D%0ASet-Cookie` | Requête bloquée | ModSecurity détecte une tentative de division de la réponse HTTP et bloque la requête. |
+| 7       | `http://example.com/?param=<!ENTITY` | Requête bloquée | ModSecurity détecte une tentative d'injection d'entité XML externe et bloque la requête. |
+| 8       | `http://example.com/?param=http://localhost` | Requête bloquée | ModSecurity détecte une tentative de requête côté serveur avec une URL locale et bloque la requête. |
+| 9       | `http://example.com/?param=_csrf_token` | Requête bloquée | ModSecurity détecte une tentative de Cross-Site Request Forgery (CSRF) et bloque la requête. |
+| 10      | `http://example.com/?param=%0D%0A` | Requête bloquée | ModSecurity détecte une tentative de division de la réponse HTTP avec des caractères spéciaux et bloque la requête. |
+
+**Explications et Commentaires :**
+
+- Ces exemples représentent différentes attaques potentielles, et ModSecurity est configuré pour les détecter et bloquer.
+- La configuration précise dépend des règles spécifiques que vous avez activées dans ModSecurity.
+- Les événements de sécurité sont généralement enregistrés dans les logs de ModSecurity, ce qui permet une analyse ultérieure.
+- Il est important de tester attentivement ces règles pour éviter de bloquer des requêtes légitimes de l'application.
+- La personnalisation des règles est essentielle pour s'assurer que le WAF répond spécifiquement aux besoins de sécurité de votre application.
+- Assurez-vous de surveiller régulièrement les logs pour identifier de nouvelles menaces et ajuster les règles en conséquence.
+
