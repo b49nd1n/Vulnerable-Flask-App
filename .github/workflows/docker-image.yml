@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag vuln-flask-app:latest
+      run: docker build . --file Dockerfile --network=host --tag vuln-flask-app:latest
 
   run:
   
@@ -25,5 +25,5 @@ jobs:
     steps:
     - name: run the service
       run: |
-        docker rm -f vuln-flask-app && 
-        docker run -d --name vuln-flask-app vuln-flask-app:latest
+        docker rm -f vuln-flask-app
+        docker run -d --name vuln-flask-app -p 8081:8081 vuln-flask-app:latest
