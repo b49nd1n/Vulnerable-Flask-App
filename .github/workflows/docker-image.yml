@@ -24,7 +24,7 @@ jobs:
 
       # Scan code using project's configuration on https://semgrep.dev/manage
       - name: scan code
-        run: docker run -it -v "${PWD}:/src" --user=1000 semgrep/semgrep semgrep scan --sarif-output /src/result.sarif
+        run: docker run -v "${PWD}:/src" --user=1000 semgrep/semgrep semgrep scan --sarif-output /src/result.sarif
 
       # Upload SARIF file generated in previous step
       - name: Upload SARIF file
