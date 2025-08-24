@@ -38,17 +38,14 @@ def welcome2(name):
 
 @app.route("/hello")
 def hello_ssti():
-    if request.args.get('name'):
-        name = request.args.get('name')
-        template = f'''<div>
-        <h1>Hello here,</h1>
-        {name} !
+    template = f'''<div>
+    <h1>Hello here, dear user!</h1>
 </div>
 '''
-        import logging
-        logging.basicConfig(filename="restapi.log", filemode='w', level=logging.DEBUG)
-        logging.debug(str(template))
-        return render_template_string(template)
+    import logging
+    logging.basicConfig(filename="restapi.log", filemode='w', level=logging.DEBUG)
+    logging.debug(str(template))
+    return render_template_string(template)
 
 @app.route("/get_users")
 def get_users():
