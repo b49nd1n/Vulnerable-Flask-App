@@ -1,0 +1,29 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag vuln-flask-app:latest
+
+  run:
+  
+    runs-on: self-hosted
+    needs: build
+
+    steps:
+    - name: run the service
+      run: |
+        docker rm -f vuln-flask-app && 
+        docker run -d --name vuln-flask-app vuln-flask-app:latest
